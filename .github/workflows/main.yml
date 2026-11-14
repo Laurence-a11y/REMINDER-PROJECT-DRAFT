@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+defaults:
+  run:
+    working-directory: Reminders-update-2/Reminders
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,7 +39,16 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Reminders-apk
-          path: out/*.apk
+          path: Reminders-update-2/Reminders/out/*.apk
 
       - name: Publish to Releases
-        uses:
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Reminders build ${{ github.run_number }}
+          body: Download the .apk below on your phone and install it.
+          files: Reminders-update-2/Reminders/out/*.apk
+
+      - name: Run logic tests
+        continue-on-error: true
+        run: ./gradlew testReleaseUnitTest
